@@ -1,7 +1,5 @@
 streamlit
-langchain
-langchain-anthropic
-langchain-openai
+google-generativeai
 python-dotenv
 PyPDF2
 pdfplumber
@@ -9,11 +7,8 @@ textstat
 pandas
 python-docx
 plotly
-watchdog
 reportlab
 langdetect
 pymongo
-anthropic
-google-generativeai
 streamlit-option-menu
 streamlit-extras

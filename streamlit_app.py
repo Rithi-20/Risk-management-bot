@@ -691,30 +691,39 @@ def main():
                      else:
                          st.success("No major red flags detected.")
 
-        # Processing Logic (Inline)
+        # Processing Logic (High-Speed Parallel execution)
         if uploaded_file and ('last_uploaded' not in st.session_state or st.session_state.last_uploaded != uploaded_file.name):
-             with st.spinner("🔮 AI is scanning your document..."):
+            from concurrent.futures import ThreadPoolExecutor
+            
+            with st.status("🔮 Parallel AI Scanning...", expanded=True) as status:
+                st.write("📂 Extracting document text...")
                 raw_text = extract_text_from_file(uploaded_file)
                 st.session_state['raw_text'] = raw_text
                 
+                st.write("🌐 Detecting language and entities...")
                 lang = detect_language(raw_text)
                 st.session_state['language'] = lang
                 entities = extract_entities(raw_text)
                 st.session_state['entities'] = entities
                 
-                clauses = split_into_clauses(raw_text)
-                analyzed_clauses = [{"text": c, "analysis": analyze_risk_with_llm(c, lang=lang)} for c in clauses[:15]]
-                st.session_state['analyzed_clauses'] = analyzed_clauses
+                st.write("📊 Analyzing clauses in parallel...")
+                clauses = split_into_clauses(raw_text)[:12] # Core clauses
                 
+                # Execute in parallel to save time
+                with ThreadPoolExecutor(max_workers=6) as executor:
+                    results = list(executor.map(lambda c: {"text": c, "analysis": analyze_risk_with_llm(c, lang=lang)}, clauses))
+                
+                st.session_state['analyzed_clauses'] = results
+                
+                st.write("📝 Finalizing overall assessment...")
                 assessment = get_overall_assessment(raw_text, lang=lang)
                 st.session_state['assessment'] = assessment
                 
-                save_contract_analysis(uploaded_file.name, raw_text, entities, analyzed_clauses, assessment)
+                save_contract_analysis(uploaded_file.name, raw_text, entities, results, assessment)
                 st.session_state['analysis_done'] = True
                 st.session_state['last_uploaded'] = uploaded_file.name
+                status.update(label="✅ Analysis Complete!", state="complete", expanded=False)
                 st.rerun()
-
-
 
 
     # 2. Clause Explorer Tab
