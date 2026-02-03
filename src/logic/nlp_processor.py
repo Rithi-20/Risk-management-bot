@@ -1,21 +1,10 @@
-import spacy
+import re
 from langdetect import detect
-
-
-# Load spaCy model
-try:
-    nlp = spacy.load("en_core_web_sm")
-except OSError:
-    # On many cloud platforms, you need to use the full name if it's not linked
-    try:
-        nlp = spacy.load("en_core_web_sm")
-    except:
-        # Final fallback for minimal functionality if spaCy fails entirely
-        nlp = None
 
 def extract_entities(text):
     """
-    Extracts key entities like ORG, PERSON, DATE, MONEY using spaCy.
+    Heuristic-based entity extraction (No Heavy Dependencies).
+    Extracts PARTIES (ORG/PERSON), DATES, MONEY, and GPE.
     """
     entities = {
         "PARTIES": [],
@@ -24,45 +13,39 @@ def extract_entities(text):
         "GPE": [] 
     }
     
-    if nlp is None:
-        return entities
+    # 1. Extract Money (e.g., $100, Rs. 500, 10,000 USD)
+    money_pattern = r'(\$|Rs\.|INR|USD)\s?\d+(?:,\d+)*(?:\.\d+)?'
+    entities["MONEY"] = list(set(re.findall(money_pattern, text)))
 
-    doc = nlp(text)
-    
-    for ent in doc.ents:
-        if ent.label_ == "ORG" or ent.label_ == "PERSON":
-            if ent.text not in entities["PARTIES"]:
-                entities["PARTIES"].append(ent.text)
-        elif ent.label_ == "DATE":
-            if ent.text not in entities["DATES"]:
-                entities["DATES"].append(ent.text)
-        elif ent.label_ == "MONEY":
-            if ent.text not in entities["MONEY"]:
-                entities["MONEY"].append(ent.text)
-        elif ent.label_ == "GPE":
-            if ent.text not in entities["GPE"]:
-                entities["GPE"].append(ent.text)
-                
+    # 2. Extract Dates (e.g., 12/05/2023, Jan 1st, 2024, 20-Oct-2022)
+    date_pattern = r'\b(?:\d{1,2}[/-]\d{1,2}[/-]\d{2,4})|(?:\d{1,2} (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{4})\b'
+    entities["DATES"] = list(set(re.findall(date_pattern, text)))
+
+    # 3. Simple Parties (Capitalized words followed by Co, Ltd, Inc, Private)
+    party_pattern = r'\b[A-Z][a-z]+ (?:Co\.|Ltd\.|Inc\.|LLP|Corp\.|Private Limited|Limited)\b'
+    entities["PARTIES"] = list(set(re.findall(party_pattern, text)))
+
+    # 4. Fallback: If nothing found, look for common patterns like "between [X] and [Y]"
+    if not entities["PARTIES"]:
+        between_match = re.search(r'between\s+([^,and]+)(?:\s+and\s+|\s*,\s*)([^,.]+)', text, re.IGNORECASE)
+        if between_match:
+            entities["PARTIES"] = [between_match.group(1).strip(), between_match.group(2).strip()]
+
     return entities
 
 def detect_language(text):
     """
     Detects the language of the text.
-    Returns: 'en', 'hi', or other codes.
     """
     try:
-        lang = detect(text)
+        lang = detect(text[:500])
         return lang
     except:
-        return "unknown"
+        return "en"
 
 def split_into_clauses(text):
-
     """
-    Basic heuristic to split text into potential clauses.
-    Real legal doc splitting is harder, but we'll use paragraph breaks and numbering.
+    Splits text into clauses based on paragraph breaks and numbering.
     """
-    # Simple split by newlines for now, or regex for "1.", "2.1", etc.
-    # This is a placeholder for more robust segmentation.
     paragraphs = [p.strip() for p in text.split('\n') if len(p.strip()) > 50]
     return paragraphs
