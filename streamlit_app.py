@@ -322,9 +322,9 @@ def main():
 
         
         /* === HIDE TOP TOOLBAR === */
+        /* Show header to ensure sidebar arrow is visible */
         header[data-testid="stHeader"] {
             background-color: transparent !important;
-            visibility: hidden !important;
         }
         
         /* Remove top padding caused by hidden header */
