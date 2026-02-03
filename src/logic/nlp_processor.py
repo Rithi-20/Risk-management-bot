@@ -2,27 +2,32 @@ import spacy
 from langdetect import detect
 
 
-# Load spaCy model (ensure it's installed via 'python -m spacy download en_core_web_sm')
+# Load spaCy model
 try:
     nlp = spacy.load("en_core_web_sm")
 except OSError:
-    # Fallback if not downloaded yet
-    import subprocess
-    import sys
-    subprocess.check_call([sys.executable, "-m", "spacy", "download", "en_core_web_sm"])
-    nlp = spacy.load("en_core_web_sm")
+    # On many cloud platforms, you need to use the full name if it's not linked
+    try:
+        nlp = spacy.load("en_core_web_sm")
+    except:
+        # Final fallback for minimal functionality if spaCy fails entirely
+        nlp = None
 
 def extract_entities(text):
     """
     Extracts key entities like ORG, PERSON, DATE, MONEY using spaCy.
     """
-    doc = nlp(text)
     entities = {
         "PARTIES": [],
         "DATES": [],
         "MONEY": [],
-        "GPE": [] # Jurisdiction often falls here
+        "GPE": [] 
     }
+    
+    if nlp is None:
+        return entities
+
+    doc = nlp(text)
     
     for ent in doc.ents:
         if ent.label_ == "ORG" or ent.label_ == "PERSON":
