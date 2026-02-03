@@ -791,9 +791,10 @@ def main():
             st.warning("No file uploaded.")
 
     # --- Floating AI Assistant (High-Performance Dialog) ---
-    @st.dialog("🤖 Legal Assistant", width="large")
+    @st.dialog("🤖 Legal Assistant")
     def ai_assistant_dialog_window():
         st.markdown("""
+            <style>
                 /* Standard text colors */
                 [data-testid="stDialog"] [data-testid="stMarkdownContainer"] p,
                 [data-testid="stDialog"] [data-testid="stMarkdownContainer"] li,
@@ -803,12 +804,17 @@ def main():
                 /* Hide the 'face' and 'smart_toy' labels */
                 span[data-testid="stChatMessageAvatarCustomIcon"],
                 span[data-testid="stChatMessageAvatarUserIcon"],
-                span[data-testid="stChatMessageAvatarAssistantIcon"] {
+                span[data-testid="stChatMessageAvatarAssistantIcon"],
+                span[data-testid="stChatMessageAvatarAssistantIcon"] + div,
+                span[data-testid="stChatMessageAvatarUserIcon"] + div {
                     display: none !important;
+                    font-size: 0 !important;
                 }
-                [data-testid="stChatMessage"] div[data-testid="stMarkdownContainer"] p:empty {
-                    display: none !important;
+                /* Hide any markdown paragraph that only contains these strings */
+                div[data-testid="stMarkdownContainer"] p {
+                    font-size: 1rem;
                 }
+                
                 /* Style the chat input area */
                 [data-testid="stChatInput"] textarea {
                     color: #1e1e2e !important;
@@ -821,8 +827,8 @@ def main():
         
         st.caption("Ask questions about your scanned contract.")
         
-        # Chat History Container (Reduced height)
-        chat_box = st.container(height=380)
+        # Chat History Container (Vertical Rectangle feel)
+        chat_box = st.container(height=450)
         with chat_box:
             if not st.session_state.chat_history:
                 st.info("👋 Hello! I'm your Legal Co-Pilot. Ask me anything about the document you uploaded.")
