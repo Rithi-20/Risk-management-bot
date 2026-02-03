@@ -794,12 +794,20 @@ def main():
     @st.dialog("🤖 Legal Assistant", width="large")
     def ai_assistant_dialog_window():
         st.markdown("""
-            <style>
-                /* Force all text inside the dialog to dark color */
+                /* Standard text colors */
                 [data-testid="stDialog"] [data-testid="stMarkdownContainer"] p,
                 [data-testid="stDialog"] [data-testid="stMarkdownContainer"] li,
                 [data-testid="stChatMessage"] p {
                     color: #1e1e2e !important;
+                }
+                /* Hide the 'face' and 'smart_toy' labels */
+                span[data-testid="stChatMessageAvatarCustomIcon"],
+                span[data-testid="stChatMessageAvatarUserIcon"],
+                span[data-testid="stChatMessageAvatarAssistantIcon"] {
+                    display: none !important;
+                }
+                [data-testid="stChatMessage"] div[data-testid="stMarkdownContainer"] p:empty {
+                    display: none !important;
                 }
                 /* Style the chat input area */
                 [data-testid="stChatInput"] textarea {
@@ -820,7 +828,8 @@ def main():
                 st.info("👋 Hello! I'm your Legal Co-Pilot. Ask me anything about the document you uploaded.")
             for msg in st.session_state.chat_history:
                 if msg["role"] != "system":
-                    with st.chat_message(msg["role"]):
+                    avatar = "👤" if msg["role"] == "user" else "🤖"
+                    with st.chat_message(msg["role"], avatar=avatar):
                         st.write(msg["content"])
         
         # Chat Input
