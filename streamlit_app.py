@@ -1,3 +1,4 @@
+# Deploy Version: 2026-02-03-23-58
 import streamlit as st
 import pandas as pd
 import time
@@ -40,14 +41,9 @@ st.markdown("""
         color: #1e1e2e;
     }
     
-    /* FIX: Completely hide the 'face' and 'smart_toy' labels in chat messages */
-    div[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] p:empty,
-    span[data-testid="stChatMessageAvatarCustomIcon"],
-    span[data-testid="stChatMessageAvatarUserIcon"],
-    span[data-testid="stChatMessageAvatarAssistantIcon"] {
-        display: none !important;
-        font-size: 0 !important;
-        color: transparent !important;
+    /* Fix text visibility in chat */
+    [data-testid="stChatMessage"] p {
+        color: #1e1e2e !important;
     }
     
     /* Ensure no text spills from the icons */
@@ -795,29 +791,23 @@ def main():
             st.warning("No file uploaded.")
 
     # --- Floating AI Assistant (High-Performance Dialog) ---
-    @st.dialog("🤖 Legal Assistant")
+    @st.dialog("🤖 Legal Assistant", width="large")
     def ai_assistant_dialog_window():
         st.markdown("""
             <style>
-                /* Force all text inside the dialog to white */
+                /* Force all text inside the dialog to dark color */
                 [data-testid="stDialog"] [data-testid="stMarkdownContainer"] p,
                 [data-testid="stDialog"] [data-testid="stMarkdownContainer"] li,
                 [data-testid="stChatMessage"] p {
-                    color: white !important;
-                }
-                /* Hide labels in the dialog specifically */
-                [data-testid="stChatMessageAvatarCustomIcon"],
-                [data-testid="stChatMessageAvatarUserIcon"],
-                [data-testid="stChatMessageAvatarAssistantIcon"] {
-                    display: none !important;
+                    color: #1e1e2e !important;
                 }
                 /* Style the chat input area */
                 [data-testid="stChatInput"] textarea {
-                    color: white !important;
+                    color: #1e1e2e !important;
                 }
-                .stCaption { color: rgba(255,255,255,0.7) !important; }
-                /* Force Alert/Info text to white */
-                .stAlert p { color: white !important; }
+                .stCaption { color: #636e72 !important; }
+                /* Force Alert/Info text to dark */
+                .stAlert p { color: #1e1e2e !important; }
             </style>
         """, unsafe_allow_html=True)
         
