@@ -1,0 +1,30 @@
+# Sensitive Info
+.env
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# IDE Settings
+.vscode/
+.idea/
+
+# Diagnostic & Temp Files
+*.log
+api_test.log
+debug_output.txt
+valid_models.txt
+model_list.txt
+check_models.py
+debug_api_full.py
+list_valid_models.py
+test_api.py
+
+# System Files
+.DS_Store
+Thumbs.db
