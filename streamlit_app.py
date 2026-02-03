@@ -60,9 +60,9 @@ st.markdown("""
         color: #1e1e2e !important;
     }
     
-    /* Ensure no text spills from the icons */
-    .st-emotion-cache-12m6p4t, .st-emotion-cache-1p6f2r1 {
-        font-size: 0 !important;
+    /* Ensure icons render correctly as symbols, not text */
+    span[data-testid="stIcon"] {
+        font-family: 'Material Symbols Outlined' !important;
     }
     .main-header {
         font-family: 'Outfit', sans-serif;
@@ -168,11 +168,16 @@ def main():
     # --- PREMIUM UI SYSTEM (Maximum Streamlit Potential) ---
     st.markdown("""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
         
         /* === GLOBAL RESET === */
-        * {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        html, body, [data-testid="stAppViewContainer"], .stApp {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        /* Ensure Material Icons/Symbols still work */
+        .material-icons, .material-symbols-outlined, [class^="st-emotion-cache"] i, [class*="st-emotion-cache"] i {
+            font-family: 'Material Symbols Outlined' !important;
         }
         
         .stApp {
