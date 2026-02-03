@@ -1,14 +1,28 @@
-# Deploy Version: 2026-02-03-23-58
+# Deploy Version: 2026-02-04-00-53
 import streamlit as st
 import pandas as pd
 import time
 import os
+import sys
+
+# --- Fix Import Path (Critical for Streamlit Cloud) ---
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
 from dotenv import load_dotenv
-from src.utils.file_handler import extract_text_from_file
-from src.logic.nlp_processor import extract_entities, split_into_clauses, detect_language
-from src.logic.risk_engine import analyze_risk_with_llm, get_overall_assessment
-from src.utils.pdf_generator import generate_pdf_report
-from src.utils.db_handler import save_contract_analysis, get_recent_contracts
+
+# Try importing from src
+try:
+    from src.utils.file_handler import extract_text_from_file
+    from src.logic.nlp_processor import extract_entities, split_into_clauses, detect_language
+    from src.logic.risk_engine import analyze_risk_with_llm, get_overall_assessment
+    from src.utils.pdf_generator import generate_pdf_report
+    from src.utils.db_handler import save_contract_analysis, get_recent_contracts
+except ImportError as e:
+    st.error(f"Import Error: {e}. Please check your file structure.")
+    st.stop()
+
 import plotly.graph_objects as go
 
 load_dotenv()
@@ -531,6 +545,13 @@ def main():
             st.sidebar.error("🔴 AI Backend: Offline")
         else:
             st.sidebar.success("🟢 AI Backend: Connected")
+        
+        # Database Status
+        from src.utils.db_handler import get_db_connection
+        if get_db_connection() is not None:
+            st.sidebar.success("🟢 Database: Connected")
+        else:
+            st.sidebar.warning("🟡 Database: History Unavailable")
         
         # Add spacing
         st.markdown("<div style='margin-bottom: 0.5rem;'></div>", unsafe_allow_html=True)

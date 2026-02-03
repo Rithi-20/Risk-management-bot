@@ -12,16 +12,30 @@ DB_NAME = "risk_bot_db"
 COLLECTION_NAME = "contracts"
 
 def get_db_connection():
-    if not MONGO_URI or "localhost" in MONGO_URI:
+    if not MONGO_URI:
+        # Silently return None if no URI is provided (e.g. initial setup)
         return None
+        
+    if "localhost" in MONGO_URI:
+        # In cloud environments, we don't want to attempt localhost
+        # unless it's a local development environment.
+        # You can toggle this if you really need local mongo.
+        return None
+
     try:
         # RetryWrites and SSL are often needed for Atlas
-        client = pymongo.MongoClient(MONGO_URI, serverSelectionTimeoutMS=2000, tls=True, tlsAllowInvalidCertificates=True) 
+        client = pymongo.MongoClient(
+            MONGO_URI, 
+            serverSelectionTimeoutMS=5000, # Increased timeout slightly
+            tls=True, 
+            tlsAllowInvalidCertificates=True
+        ) 
         # Quick ping to check connection
         client.admin.command('ping')
         db = client[DB_NAME]
         return db[COLLECTION_NAME]
-    except Exception:
+    except Exception as e:
+        print(f"MongoDB Connection Error: {e}")
         return None
 
 def save_contract_analysis(filename, text, entities, risk_analysis, overall_assessment):
@@ -61,5 +75,6 @@ def get_recent_contracts(limit=5):
     try:
         cursor = collection.find({}, {"filename": 1, "upload_date": 1, "risk_overall_score": 1}).sort("upload_date", -1).limit(limit)
         return list(cursor)
-    except Exception:
+    except Exception as e:
+        print(f"Error fetching history: {e}")
         return []
