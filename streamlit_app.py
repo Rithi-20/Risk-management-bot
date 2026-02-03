@@ -26,7 +26,7 @@ except ImportError:
 
 # --- Config ---
 st.set_page_config(
-    page_title="GenAI Legal SME Assistant",
+    page_title="Legal Co-Pilot AI",
     page_icon="⚖️",
     layout="wide",
     initial_sidebar_state="expanded"
