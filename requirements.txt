@@ -9,6 +9,8 @@ python-docx
 plotly
 reportlab
 langdetect
-pymongo
+pymongo[srv]
+dnspython
+certifi
 streamlit-option-menu
 streamlit-extras

@@ -687,7 +687,7 @@ def main():
                  
                  with c_chart:
                      score = st.session_state['assessment']['overall_score']
-                     st.plotly_chart(draw_risk_gauge(score), use_container_width=True)
+                     st.plotly_chart(draw_risk_gauge(score), width="stretch")
                      
                      # Download Report Button styled as a big action
                      pdf_file = generate_pdf_report(
@@ -703,7 +703,7 @@ def main():
                          data=pdf_file, 
                          file_name="Risk_Report.pdf", 
                          mime="application/pdf", 
-                         use_container_width=True, 
+                         width="stretch", 
                          type="primary"
                     )
 

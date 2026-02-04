@@ -11,24 +11,23 @@ MONGO_URI = os.getenv("MONGO_URI")
 DB_NAME = "risk_bot_db" 
 COLLECTION_NAME = "contracts"
 
+import certifi
+
 def get_db_connection():
     if not MONGO_URI:
-        # Silently return None if no URI is provided (e.g. initial setup)
         return None
         
     if "localhost" in MONGO_URI:
-        # In cloud environments, we don't want to attempt localhost
-        # unless it's a local development environment.
-        # You can toggle this if you really need local mongo.
         return None
 
     try:
-        # RetryWrites and SSL are often needed for Atlas
+        # certifi.where() provides a reliable set of root certificates
+        # for SSL/TLS handshakes in cloud environments.
         client = pymongo.MongoClient(
             MONGO_URI, 
-            serverSelectionTimeoutMS=5000, # Increased timeout slightly
+            serverSelectionTimeoutMS=10000, 
             tls=True, 
-            tlsAllowInvalidCertificates=True
+            tlsCAFile=certifi.where()
         ) 
         # Quick ping to check connection
         client.admin.command('ping')
