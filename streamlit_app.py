@@ -690,7 +690,14 @@ def main():
                      st.plotly_chart(draw_risk_gauge(score), use_container_width=True)
                      
                      # Download Report Button styled as a big action
-                     pdf_file = generate_pdf_report(st.session_state.get('last_uploaded', 'Contract'), score, st.session_state['assessment']['summary'], st.session_state['analyzed_clauses'])
+                     pdf_file = generate_pdf_report(
+                         st.session_state.get('last_uploaded', 'Contract'), 
+                         score, 
+                         st.session_state['assessment']['summary'], 
+                         st.session_state['analyzed_clauses'],
+                         entities=st.session_state.get('entities'),
+                         language=st.session_state.get('language', 'en')
+                     )
                      st.download_button(
                          "📄 Download Summary Report", 
                          data=pdf_file, 
